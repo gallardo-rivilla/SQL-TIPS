@@ -5,6 +5,8 @@ https://i.stack.imgur.com/AyIkW.png
 -- Más BBDD de StackOverFlow
 https://www.brentozar.com/archive/2015/10/how-to-download-the-stack-overflow-database-via-bittorrent/
 
+-- Descarga fichero:
+https://github.com/gallardo-rivilla/SQL-TIPS.git
 
 /* INTRODUCCIÓN
 Ejemplo de USO de la instrucción SELECT
