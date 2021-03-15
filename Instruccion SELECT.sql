@@ -49,7 +49,7 @@ SELECT [ ALL | DISTINCT ]
 
 
 -- 1.Primeros pasos
-
+-------------------------------------
 SELECT 1 as numero;
 SELECT 1+2 as suma;
 SELECT 1+2 AS resultado;
@@ -70,24 +70,26 @@ SELECT * FROM [dbo].[Comments]
 SELECT * FROM [dbo].[Badges]
 
 -- 2.TIPS consultar tabla 
+----------------------------------------------------
 sp_help '[dbo].[Users]'
 sp_help '[dbo].[Comments]'
 sp_help '[dbo].[Badges]'
+
+
 --- Uso de SELECT con campos seleccionados.
-
-
 SET STATISTICS IO ON
 
 SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate], [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]
 FROM [dbo].[Users]
-
+--- Uso de SELECT con campos sin seleccionar.
 SELECT * FROM [dbo].[Users]
 
 SET STATISTICS IO OFF 
 
 
 
----3. Uso de funciones con select
+--3. Uso de funciones con select
+-----------------------------------------------------
 -- Evitar uso COUNT(*)
 SELECT COUNT([Id]) FROM [dbo].[Users] -- Total registros tabla Users
 SELECT COUNT([Id]) FROM [dbo].[Comments] -- Total registros tabla Comments
@@ -97,6 +99,7 @@ SELECT MIN([Views]) FROM  [dbo].[Users] -- Minimas vistas
 
 
 -- 4.SQL TOP y TOP PERCENT
+-------------------------------------------------------
 -- Se utiliza para especificar el número de registros que se devolverán.
 -- SELECT TOP number column_name FROM table_name WHERE condition;
 
@@ -104,17 +107,20 @@ SELECT TOP 10 [Id], [CreationDate], [PostId], [Score], [Text], [UserId] FROM [db
 SELECT TOP 50 PERCENT [Id], [CreationDate], [PostId], [Score], [Text], [UserId] FROM [dbo].[Comments] -- selecciona el primer 50% de los registros
 
 -- 5.SELECT DISTINCT 
+-----------------------------------------------------------
 -- Selecciona solo los valores DISTINCT de la columna desada
 
 SELECT  DISTINCT Name FROM [dbo].[Badges]
 
 
 -- 6.SQL COUNT + DISTINCT
+---------------------------------------------------------------------
 -- Consulta para mostrar el total de diferentes Insignias.
 
 SELECT COUNT(DISTINCT Name) FROM [dbo].[Badges]
 
 -- 7. SELECT INTO
+---------------------------------------------------------------------
 -- Copia datos de una tabla a una tabla nueva
 /*
 SELECT columna1, columna2, columna3, ...
@@ -134,3 +140,40 @@ GO
 SELECT COUNT([Id]) FROM [dbo].[Comments]
 -- Borramos la tabla creada para realizar otro insert.
 drop table [dbo].[Comments]
+
+-- Realizamos una copia de los comentarios con un score superior a 8
+SELECT [Id], [CreationDate], [PostId], [Score], [Text], [UserId] INTO [StackOverflow2010_backup].[dbo].[Comments]
+FROM [dbo].[Comments]
+where score > 8
+
+-- Comprobamos que se han insertado:
+USE [StackOverflow2010_backup]
+GO
+SELECT [Id], [CreationDate], [PostId], [Score], [Text], [UserId] FROM [dbo].[Comments]
+
+-- 7. INTO SELECT
+-- Copia datos de una tabla y los inserta en otra tabla
+-- Requiere que los tipos de datos en las tablas de origen y destino coincidan.
+/*
+INSERT INTO destino (column1, column2, column3, ...)
+SELECT column1, column2, column3, ...
+FROM origen
+WHERE condición;
+*/
+-- Borramos previamente los datos insertados en el Tip anterior 
+USE [StackOverflow2010_backup]
+GO
+DELETE [dbo].[Comments]
+--- Realizamos el INSERT INTO SELECT
+
+ -- Importante habilitar IDENTITY_INSERT. Más info: https://docs.microsoft.com/es-es/sql/t-sql/statements/set-identity-insert-transact-sql?view=sql-server-ver15
+ -- Solo una tabla de una sesión puede tener la propiedad IDENTITY_INSERT establecida en ON.
+ -- Debes ser el propietario de la tabla o disponer del permiso ALTER en esta.
+
+SET IDENTITY_INSERT [dbo].[Comments] ON
+
+INSERT INTO [dbo].[Comments] ([Id], [CreationDate], [PostId], [Score], [Text], [UserId])
+SELECT [Id], [CreationDate], [PostId], [Score], [Text], [UserId]
+FROM [StackOverflow2010].[dbo].[Comments]
+
+SET IDENTITY_INSERT [dbo].[Comments] OFF -- Volvemos a desactivarlo.
