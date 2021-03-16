@@ -76,15 +76,10 @@ sp_help '[dbo].[Comments]'
 sp_help '[dbo].[Badges]'
 
 
---- Uso de SELECT con campos seleccionados.
-SET STATISTICS IO ON
+---2.1 TIPS mostrar todas las columnas
+SELECT [Id], [CreationDate], [PostId], [Score], [Text], [UserId] FROM [dbo].[Comments]
 
-SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate], [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]
-FROM [dbo].[Users]
---- Uso de SELECT con campos sin seleccionar.
-SELECT * FROM [dbo].[Users]
 
-SET STATISTICS IO OFF 
 
 
 
@@ -116,7 +111,7 @@ SELECT  DISTINCT Name FROM [dbo].[Badges]
 -- 6.SQL COUNT + DISTINCT
 ---------------------------------------------------------------------
 -- Consulta para mostrar el total de diferentes Insignias.
-
+SELECT DISTINCT Name FROM [dbo].[Badges]
 SELECT COUNT(DISTINCT Name) FROM [dbo].[Badges]
 
 -- 7. SELECT INTO
@@ -138,8 +133,12 @@ USE [StackOverflow2010_backup]
 GO
 -------------------------------------
 SELECT COUNT([Id]) FROM [dbo].[Comments]
--- Borramos la tabla creada para realizar otro insert.
-drop table [dbo].[Comments]
+
+-- 8. TIPS Borramos la tabla creada para realizar otro insert.
+USE [StackOverflow2010]
+GO
+drop table [dbo].[Comments] -- Eliminar tabla completa 
+DELETE FROM [dbo].[Comments] -- Borrar registros
 
 -- Realizamos una copia de los comentarios con un score superior a 8
 SELECT [Id], [CreationDate], [PostId], [Score], [Text], [UserId] INTO [StackOverflow2010_backup].[dbo].[Comments]
@@ -151,7 +150,7 @@ USE [StackOverflow2010_backup]
 GO
 SELECT [Id], [CreationDate], [PostId], [Score], [Text], [UserId] FROM [dbo].[Comments]
 
--- 7. INTO SELECT
+-- 9. INTO SELECT
 -- Copia datos de una tabla y los inserta en otra tabla
 -- Requiere que los tipos de datos en las tablas de origen y destino coincidan.
 /*
